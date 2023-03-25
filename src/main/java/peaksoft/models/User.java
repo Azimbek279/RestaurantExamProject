@@ -5,7 +5,7 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import peaksoft.enums.Role;
+import peaksoft.models.enums.Role;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -33,7 +33,6 @@ public class User implements UserDetails {
     private Role role;
     private Integer experience;
 
-    private Boolean accepted;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinColumn(name = "restaurant_id")

@@ -3,7 +3,6 @@ package peaksoft.service.impl;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,12 +10,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import peaksoft.config.jwt.JwtUtil;
 import peaksoft.dto.requests.AuthUserRequest;
+import peaksoft.dto.requests.UserApplicationRequest;
 import peaksoft.dto.requests.UserRequest;
 import peaksoft.dto.responses.SimpleResponse;
 import peaksoft.dto.responses.user.*;
+import peaksoft.excetions.NotFoundException;
 import peaksoft.models.Restaurant;
 import peaksoft.models.User;
-import peaksoft.enums.Role;
+import peaksoft.models.enums.Role;
 import peaksoft.repository.RestaurantRepository;
 import peaksoft.repository.UserRepository;
 import peaksoft.service.UserService;
@@ -89,9 +90,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public SimpleResponse save(UserRequest request) {
 
-        Restaurant restaurant = restaurantRepository.findById(request.restaurantId())
-                .orElseThrow(() -> new NoSuchElementException(
-                        String.format("Restaurant with id: %s not found!", request.restaurantId())));
+        Restaurant restaurant = restaurantRepository.findRestaurant()
+                .orElseThrow(() -> new NoSuchElementException("Restaurant with not found!"));
 
         /** Validations **/
         if (restaurant.getUsers().size() > 15) {
@@ -150,7 +150,6 @@ public class UserServiceImpl implements UserService {
                 .phoneNumber(request.phoneNumber())
                 .experience(request.experience())
                 .restaurant(restaurant)
-                .accepted(true)
                 .build();
 
         userRepository.save(user);
@@ -311,7 +310,6 @@ public class UserServiceImpl implements UserService {
                 .role(request.role())
                 .phoneNumber(request.phoneNumber())
                 .experience(request.experience())
-                .accepted(false)
                 .build();
 
         userRepository.save(user);
@@ -323,86 +321,104 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AbstractApplicationClass applications(Long id, Boolean accepted) {
+    public SimpleResponse applications(UserApplicationRequest applicationRequest) {
+        User user = userRepository.findById(applicationRequest.id())
+                .orElseThrow(() -> new NotFoundException("This id:" + applicationRequest.id() + " does not exist"));
 
-        if (accepted == null && id != null) {
-
-            if (userRepository.findAllByAcceptedFalse().stream().noneMatch(u -> u.getId().equals(id))) {
-                return new ApplicationResponse(
-                        HttpStatus.NOT_FOUND,
-                        String.format("User with id: %s not in requests", id),
-                        null);
-            }
-
-            return new ApplicationResponse(
-                    HttpStatus.OK,
-                    "User with id: " + id,
-                    userRepository.findUserResponseById(id)
-                            .orElseThrow(() -> new NoSuchElementException(
-                                    String.format("User with id: %s not found!", id))));
+        if (applicationRequest.accepted()) {
+            user.setRestaurant(restaurantRepository.findById(restaurantRepository.findRestaurant()
+                    .orElseThrow(()->new NotFoundException("This Restaurant is null!!")).getId()).orElseThrow(() -> new NotFoundException("This Restaurant does not exist")));
+            userRepository.save(user);
+            return new SimpleResponse(HttpStatus.OK, "Congratulations you have successfully got a job!!");
+        } else {
+            userRepository.delete(user);
+            return new SimpleResponse(HttpStatus.OK, "You couldn't get a job");
         }
-
-        if (id != null && Boolean.TRUE.equals(accepted)) {
-            List<User> users = userRepository.findAllByAcceptedFalse();
-            if (users != null) {
-
-                boolean isExists = userRepository.findAllByAcceptedFalse().stream().anyMatch(u -> u.getId().equals(id));
-                if (!isExists) {
-                    return new ApplicationResponse(
-                            HttpStatus.NOT_FOUND,
-                            String.format("User with id: %s not in requests", id),
-                            null);
-                }
-
-                Restaurant restaurant = restaurantRepository.findById(1L)
-                        .orElseThrow(() -> new NoSuchElementException(
-                                String.format("Restaurant with id: %s not found!", 1L)));
-
-                User user = users.stream().filter(u -> u.getId().equals(id)).findFirst().
-                        orElseThrow(() -> new NoSuchElementException(
-                                String.format("User with id: %s not found!", id)));
-
-                user.setRestaurant(restaurant);
-                user.setAccepted(true);
-
-                userRepository.save(user);
-
-                return new ApplicationResponse(
-                        HttpStatus.OK,
-                        String.format("User with fullName: %s %s successfully accepted",
-                                user.getLastName(), user.getFirstName()),
-                        userRepository.findUserResponseById(id)
-                                .orElseThrow(() -> new NoSuchElementException(
-                                        String.format("User with ID: %s not found", id))));
-
-            }
-
-        } else if (id != null) {
-            List<User> users = userRepository.findAllByAcceptedFalse();
-            if (users != null) {
-
-                boolean isExists = userRepository.findAllByAcceptedFalse().stream().anyMatch(u -> u.getId().equals(id));
-                if (!isExists) {
-                    return new ApplicationResponse(
-                            HttpStatus.NOT_FOUND,
-                            String.format("User with id: %s not in requests", id)
-                    );
-                }
-
-                userRepository.deleteById(id);
-                return new ApplicationResponse(
-                        HttpStatus.OK,
-                        String.format("User with id: %s successfully not accepted!", id),
-                        null);
-            }
-        } else if (accepted == null) {
-            return new ApplicationsResponse(
-                    HttpStatus.OK,
-                    "Not accepted",
-                    userRepository.findAllUserResponsesByAcceptedFalse());
-        }
-        return null;
     }
+
+//    @Override
+//    public AbstractApplicationClass applications(UserApplicationRequest userApplicationRequest) {
+//
+//        if (userApplicationRequest.accepted() == null && userApplicationRequest.id() != null) {
+//
+//            if (userRepository.findAllByAcceptedFalse().stream().noneMatch(u -> u.getId().equals(userApplicationRequest.id()))) {
+//                return new ApplicationResponse(
+//                        HttpStatus.NOT_FOUND,
+//                        String.format("User with id: %s not in requests", userApplicationRequest.id()),
+//                        null);
+//            }
+//
+//            return new ApplicationResponse(
+//                    HttpStatus.OK,
+//                    "User with id: " + userApplicationRequest.id(),
+//                    userRepository.findUserResponseById(userApplicationRequest.id())
+//                            .orElseThrow(() -> new NoSuchElementException(
+//                                    String.format("User with id: %s not found!", userApplicationRequest.id()))));
+//        }
+//
+//        if (userApplicationRequest.id() != null && Boolean.TRUE.equals(userApplicationRequest.accepted())) {
+//            List<User> users = userRepository.findAllByAcceptedFalse();
+//            if (users != null) {
+//
+//                boolean isExists = userRepository.findAllByAcceptedFalse().stream().anyMatch(u -> u.getId().equals(userApplicationRequest.id()));
+//                if (!isExists) {
+//                    return new ApplicationResponse(
+//                            HttpStatus.NOT_FOUND,
+//                            String.format("User with id: %s not in requests", userApplicationRequest.id()),
+//                            null);
+//                }
+//
+//                Restaurant restaurant = restaurantRepository.findById(1L)
+//                        .orElseThrow(() -> new NoSuchElementException(
+//                                String.format("Restaurant with id: %s not found!", 1L)));
+//
+//                User user = users.stream().filter(u -> u.getId().equals(userApplicationRequest.id())).findFirst().
+//                        orElseThrow(() -> new NoSuchElementException(
+//                                String.format("User with id: %s not found!", userApplicationRequest.id())));
+//
+//                user.setRestaurant(restaurant);
+//                user.setAccepted(true);
+//
+//                userRepository.save(user);
+//
+//                return new ApplicationResponse(
+//                        HttpStatus.OK,
+//                        String.format("User with fullName: %s %s successfully accepted",
+//                                user.getLastName(), user.getFirstName()),
+//                        userRepository.findUserResponseById(userApplicationRequest.id())
+//                                .orElseThrow(() -> new NoSuchElementException(
+//                                        String.format("User with ID: %s not found", userApplicationRequest))));
+//
+//            }
+//
+//        } else if (userApplicationRequest.id() != null) {
+//            List<User> users = userRepository.findAllByAcceptedFalse();
+//            if (users != null) {
+//
+//                boolean isExists = userRepository.findAllByAcceptedFalse().stream().anyMatch(u -> u.getId().equals(userApplicationRequest.id()));
+//                if (!isExists) {
+//                    return new ApplicationResponse(
+//                            HttpStatus.NOT_FOUND,
+//                            String.format("User with id: %s not in requests", userApplicationRequest.id())
+//                    );
+//                }
+//
+//                userRepository.deleteById(userApplicationRequest.id());
+//                return new ApplicationResponse(
+//                        HttpStatus.OK,
+//                        String.format("User with id: %s successfully not accepted!", userApplicationRequest.id()),
+//                        null);
+//            }
+//        } else if (userApplicationRequest.accepted() == null) {
+//            return new ApplicationsResponse(
+//                    HttpStatus.OK,
+//                    "Not accepted",
+//                    userRepository.findAllUserResponsesByAcceptedFalse());
+//        }
+//        return null;
+//    }
+
+
 
 
 }

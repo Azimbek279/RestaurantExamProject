@@ -1,17 +1,17 @@
 package peaksoft.dto.responses.user;
 
-import lombok.Builder;
 import peaksoft.models.enums.Role;
 
 import java.time.LocalDate;
-@Builder
-public record UserResponse (
+
+public record EmployeeResponse(
         Long id,
-        String fullName,
-        LocalDate dateOfBirth,
+        String firstName,
+        String lastName,
+        LocalDate dateOfBrith,
         String email,
-        String phoneNumber,
         Role role,
+        String phoneNumber,
         Integer experience
 ) {
 }

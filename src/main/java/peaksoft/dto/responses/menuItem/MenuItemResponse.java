@@ -1,5 +1,8 @@
 package peaksoft.dto.responses.menuItem;
 
+import lombok.Builder;
+
+@Builder
 public record MenuItemResponse(
         String name,
         String image,

@@ -5,16 +5,10 @@ import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+
 @Builder
-public class ApplicationsResponse implements AbstractApplicationClass {
-    private HttpStatus status;
-    private  String applicationStatus;
-    private List<UserAllResponse> users;
-
-
-
-}
+public record ApplicationsResponse  (
+     HttpStatus status,
+      String applicationStatus,
+     List<UserAllResponse> users
+){}

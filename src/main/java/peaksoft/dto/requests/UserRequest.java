@@ -2,7 +2,7 @@ package peaksoft.dto.requests;
 
 import jakarta.validation.constraints.*;
 import lombok.Builder;
-import peaksoft.enums.Role;
+import peaksoft.models.enums.Role;
 
 import java.time.LocalDate;
 
@@ -28,8 +28,6 @@ public record UserRequest(
         @NotNull(message = "role cannot be empty!")
         Role role,
         @Positive(message = "experience cannot be empty!")
-        Integer experience,
-        @Positive(message = "restaurantId cannot be empty!")
-        Long restaurantId
+        Integer experience
 ) {
 }

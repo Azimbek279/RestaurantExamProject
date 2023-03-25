@@ -9,6 +9,7 @@ import peaksoft.dto.requests.RestaurantRequest;
 import peaksoft.dto.responses.SimpleResponse;
 import peaksoft.dto.responses.restaurant.RestaurantAllResponse;
 import peaksoft.dto.responses.restaurant.RestaurantResponse;
+import peaksoft.dto.responses.user.EmployeeResponse;
 import peaksoft.service.RestaurantService;
 
 import java.util.List;
@@ -41,7 +42,7 @@ public class RestaurantAPI {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
-    public List<RestaurantAllResponse> findAll(){
+    public RestaurantResponse findAll(){
         return restaurantService.findAll();
     }
 
@@ -57,6 +58,12 @@ public class RestaurantAPI {
     @DeleteMapping("/{id}")
     public SimpleResponse delete(@PathVariable Long id){
         return restaurantService.delete(id);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/getWorkers")
+    public String getAllWorkers(){
+        return restaurantService.count();
     }
 
 

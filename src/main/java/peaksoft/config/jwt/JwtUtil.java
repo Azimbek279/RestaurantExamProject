@@ -22,7 +22,7 @@ public class JwtUtil {
         return JWT.create()
                 .withClaim("username",userDetails.getUsername())
                 .withIssuedAt(new Date())
-                .withExpiresAt(Date.from(ZonedDateTime.now().plusMinutes(60).toInstant()))
+                .withExpiresAt(Date.from(ZonedDateTime.now().plusMinutes(60000).toInstant()))
                 .sign(Algorithm.HMAC256(SECRET_KEY));
     }
 

@@ -26,7 +26,7 @@ public class SubCategoryAPI {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body("An error occurred: "+e.getMessage());
     }
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAnyAuthority('ADMIN','CHEF','WAITER')")
     @GetMapping
     public List<SubCategoryResponse> findAll(@RequestParam(required = false) Long id) {
         return subcategoryService.findAll(id);

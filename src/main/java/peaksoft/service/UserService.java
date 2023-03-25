@@ -1,12 +1,10 @@
 package peaksoft.service;
 
 import peaksoft.dto.requests.AuthUserRequest;
+import peaksoft.dto.requests.UserApplicationRequest;
 import peaksoft.dto.requests.UserRequest;
 import peaksoft.dto.responses.SimpleResponse;
-import peaksoft.dto.responses.user.AbstractApplicationClass;
-import peaksoft.dto.responses.user.UserAllResponse;
-import peaksoft.dto.responses.user.UserResponse;
-import peaksoft.dto.responses.user.UserTokenResponse;
+import peaksoft.dto.responses.user.*;
 
 import java.util.List;
 
@@ -27,5 +25,8 @@ public interface UserService {
 
     SimpleResponse application(UserRequest request);
 
-    AbstractApplicationClass applications(Long id, Boolean accepted);
+//    ApplicationsResponse applications(UserApplicationRequest userApplicationRequest);
+
+    SimpleResponse applications (UserApplicationRequest applicationRequest);
+
 }

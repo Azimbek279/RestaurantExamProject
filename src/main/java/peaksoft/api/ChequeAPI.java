@@ -1,12 +1,18 @@
 package peaksoft.api;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import peaksoft.dto.requests.ChequeOfRestaurantAmountDayRequest;
+import peaksoft.dto.requests.ChequeOneDayTotalAmountRequest;
 import peaksoft.dto.requests.ChequeRequest;
 import peaksoft.dto.responses.SimpleResponse;
+import peaksoft.dto.responses.cheque.ChequeFinalResponse;
+import peaksoft.dto.responses.cheque.ChequeOfRestaurantAmountDayResponse;
+import peaksoft.dto.responses.cheque.ChequeOneDayTotalAmountResponse;
 import peaksoft.dto.responses.cheque.ChequeResponse;
 import peaksoft.service.ChequeService;
 
@@ -35,7 +41,7 @@ public class ChequeAPI {
 
     @PreAuthorize("hasAnyAuthority('ADMIN','WAITER')")
     @GetMapping("/{id}")
-    public ChequeResponse findById(@PathVariable Long id){
+    public ChequeFinalResponse findById(@PathVariable Long id){
         return chequeService.findById(id);
     }
 
@@ -51,7 +57,7 @@ public class ChequeAPI {
         return chequeService.delete(id);
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN','WAITER')")
+    @PreAuthorize("permitAll()")
     @GetMapping
     public List<ChequeResponse> findAll(){
         return chequeService.findAll();
@@ -65,10 +71,21 @@ public class ChequeAPI {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping("/avg")
+    @GetMapping("/avgs")
     public SimpleResponse avg(@RequestParam(required = false) LocalDate date){
         return chequeService.avg(Objects.requireNonNullElseGet(date, LocalDate::now));
     }
 
+    @GetMapping("/countWaiter")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ChequeOneDayTotalAmountResponse chequeOneDayTotalAmountResponse(@RequestBody @Valid ChequeOneDayTotalAmountRequest chequeOneDayTotalAmountRequest) {
+        return chequeService.findAllChequesOneDayTotalAmount(chequeOneDayTotalAmountRequest);
+    }
+
+    @GetMapping("/avg")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ChequeOfRestaurantAmountDayResponse chequeOfRestaurantAmountDayResponse(@RequestBody @Valid ChequeOfRestaurantAmountDayRequest chequeOfRestaurantAmountDayRequest) {
+        return chequeService.countRestGrantTotalForDay(chequeOfRestaurantAmountDayRequest);
+    }
 
 }

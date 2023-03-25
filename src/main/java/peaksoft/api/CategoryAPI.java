@@ -25,9 +25,9 @@ public class CategoryAPI {
                 .body("An error occurred: "+e.getMessage());
     }
 
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAnyAuthority('ADMIN','CHEF','WAITER')")
     @GetMapping
-    public List<CategoryResponse> findAl(){
+    public List<CategoryResponse> findAll(){
         return categoryService.findAll();
     }
 

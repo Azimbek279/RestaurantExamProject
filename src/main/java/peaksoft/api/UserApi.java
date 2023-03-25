@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import peaksoft.dto.requests.AuthUserRequest;
+import peaksoft.dto.requests.UserApplicationRequest;
 import peaksoft.dto.requests.UserRequest;
 import peaksoft.dto.responses.*;
 import peaksoft.dto.responses.user.*;
@@ -78,10 +79,12 @@ public class UserApi {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/applications")
-    public AbstractApplicationClass applications(@RequestParam(required = false) Long id,
-                                                 @RequestParam(required = false) Boolean accepted) {
-        return userService.applications(id, accepted);
+    public SimpleResponse applications(@RequestBody UserApplicationRequest userApplicationRequest) {
+        return userService.applications(userApplicationRequest);
     }
+
+
+
 
 
 }

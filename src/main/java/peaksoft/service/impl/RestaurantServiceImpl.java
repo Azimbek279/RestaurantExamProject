@@ -2,16 +2,24 @@ package peaksoft.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import peaksoft.dto.requests.RestaurantRequest;
 import peaksoft.dto.responses.SimpleResponse;
 import peaksoft.dto.responses.restaurant.RestaurantAllResponse;
 import peaksoft.dto.responses.restaurant.RestaurantResponse;
+import peaksoft.dto.responses.user.EmployeeResponse;
+import peaksoft.dto.responses.user.UserResponse;
+import peaksoft.excetions.AlreadyExistsException;
+import peaksoft.excetions.NotFoundException;
 import peaksoft.models.Restaurant;
+import peaksoft.models.enums.Role;
 import peaksoft.repository.RestaurantRepository;
+import peaksoft.repository.UserRepository;
 import peaksoft.service.RestaurantService;
 
+import java.rmi.NotBoundException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -20,6 +28,8 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class RestaurantServiceImpl implements RestaurantService {
     private final RestaurantRepository restaurantRepository;
+
+    private final UserRepository userRepository;
 
     @Override
     public RestaurantResponse getById(Long id) {
@@ -38,23 +48,28 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Override
     public SimpleResponse save(RestaurantRequest request) {
 
-        Restaurant restaurant = Restaurant.builder()
-                .name(request.name())
-                .location(request.location())
-                .resType(request.resType())
-                .service(request.service())
-                .build();
+        if(!restaurantRepository.existsRestaurant()){
+            Restaurant restaurant = Restaurant.builder()
+                    .name(request.name())
+                    .location(request.location())
+                    .resType(request.resType())
+                    .service(request.service())
+                    .build();
 
-        restaurantRepository.save(restaurant);
+            restaurantRepository.save(restaurant);
+        }else {
+            throw  new AlreadyExistsException("Restaurant is already exists");
+        }
+
 
         return SimpleResponse.builder()
                 .status(HttpStatus.OK)
-                .message(String.format("Restaurant with name: %s successfully saved!", restaurant.getName()))
+                .message("Restaurant with name: "+request.name()+" successfully saved!" )
                 .build();
     }
 
     @Override
-    public List<RestaurantAllResponse> findAll() {
+    public RestaurantResponse findAll() {
         return restaurantRepository.findAllRestaurantResponses();
     }
 
@@ -91,5 +106,23 @@ public class RestaurantServiceImpl implements RestaurantService {
                 .status(HttpStatus.OK)
                 .message(String.format("Restaurant with id: %s successfully updated",id))
                 .build();
+    }
+
+    @Override
+    public String count() {
+        List<EmployeeResponse> allUsers = userRepository.getAllWorkers(restaurantRepository.findRestaurant().get().getId());
+        int countChef = 0;
+        int countWaiter = 0;
+        for (EmployeeResponse allUser : allUsers) {
+            if (allUser.role().equals(Role.WAITER)) {
+                countWaiter++;
+            }
+            if (allUser.role().equals(Role.CHEF)) {
+                countChef++;
+            }
+        }
+        return "Currently the restaurant has " + allUsers.size() + " employees .\n" +
+                "Chefs: " + countChef
+                + "\nWaiters: " + countWaiter;
     }
 }

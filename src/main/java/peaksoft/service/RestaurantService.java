@@ -14,8 +14,10 @@ public interface RestaurantService {
 
     SimpleResponse save(RestaurantRequest request);
 
-    List<RestaurantAllResponse> findAll();
+  RestaurantResponse findAll();
 
     SimpleResponse delete(Long id);
     SimpleResponse update(Long id,RestaurantRequest request);
+
+    String count();
 }
