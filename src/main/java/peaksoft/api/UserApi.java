@@ -72,6 +72,7 @@ public class UserApi {
     }
 
 
+    @PreAuthorize("hasAnyAuthority('WAITER','ADMIN')")
     @PostMapping("/application")
     public SimpleResponse application(@RequestBody @Valid UserRequest request) {
         return userService.application(request);

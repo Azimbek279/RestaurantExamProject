@@ -2,12 +2,16 @@ package peaksoft.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import peaksoft.dto.requests.MenuItemRequest;
 import peaksoft.dto.responses.SimpleResponse;
 import peaksoft.dto.responses.menuItem.MenuItemAllResponse;
 import peaksoft.dto.responses.menuItem.MenuItemResponse;
+import peaksoft.dto.responses.menuItem.PaginationResponse;
 import peaksoft.models.MenuItem;
 import peaksoft.models.Restaurant;
 import peaksoft.models.SubCategory;
@@ -125,9 +129,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
 
 
-    /**
-     * Dodelat
-     **/
+
     @Override
     public List<MenuItemAllResponse> findAll(String global, String sort, Boolean isVegan) {
 
@@ -138,5 +140,19 @@ public class MenuItemServiceImpl implements MenuItemService {
         } else {
             return findAll();
         }
+    }
+
+    @Override
+    public PaginationResponse getMenuItemPagination(int page, int size) {
+
+        Pageable pageable = PageRequest.of(page-1,size);
+        Page<MenuItem> pagedMenuItem = menuItemRepository.findAll(pageable);
+
+        PaginationResponse paginationResponse = new PaginationResponse();
+        paginationResponse.setMenuItems(pagedMenuItem.getContent());
+        paginationResponse.setCurrentPage(pageable.getPageNumber()+1);
+        paginationResponse.setPageSize(pagedMenuItem.getTotalPages());
+
+        return paginationResponse;
     }
 }
