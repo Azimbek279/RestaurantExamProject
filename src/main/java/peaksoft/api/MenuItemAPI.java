@@ -62,7 +62,6 @@ public class MenuItemAPI {
         return menuItemService.delete(id);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/pagination")
     public PaginationResponse getMenuItemPagination(@RequestParam int page,@RequestParam  int size){
         return menuItemService.getMenuItemPagination(page, size);

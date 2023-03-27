@@ -47,7 +47,6 @@ public class RestaurantAPI {
     }
 
 
-    /**  Peredelat **/
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping ("/{id}")
     public SimpleResponse update(@PathVariable Long id,@RequestBody RestaurantRequest request){

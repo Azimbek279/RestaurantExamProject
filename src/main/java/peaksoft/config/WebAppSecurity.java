@@ -27,6 +27,7 @@ public class WebAppSecurity {
         this.userRepository = userRepository;
     }
 
+    // dataBase email tabyp alyp atabyz
     @Bean
     public UserDetailsService userDetailsService() {
         return email -> userRepository.findByEmail(email)

@@ -21,6 +21,7 @@ public class SecurityConfig {
         this.jwtFilter = jwtFilter;
     }
 
+    // kimge dostup bar ekenin alyp beret
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf()

@@ -18,6 +18,7 @@ public class JwtUtil {
     @Value("${spring.jwt.secret_key}")
     private String SECRET_KEY;
 
+    // token generation kylyp atat
     public String generateToken(UserDetails userDetails){
         return JWT.create()
                 .withClaim("username",userDetails.getUsername())
@@ -27,6 +28,7 @@ public class JwtUtil {
     }
 
 
+    // generation bolgon tokendi teksherip berip atat
     public String validateTokenAndRetrieveClaim(String token) throws JWTVerificationException {
         JWTVerifier verifier=JWT
                 .require(Algorithm.HMAC256(SECRET_KEY))
