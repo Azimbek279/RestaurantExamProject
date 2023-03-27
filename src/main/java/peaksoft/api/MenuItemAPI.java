@@ -1,8 +1,6 @@
 package peaksoft.api;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import peaksoft.dto.requests.MenuItemRequest;
@@ -13,7 +11,6 @@ import peaksoft.dto.responses.menuItem.PaginationResponse;
 import peaksoft.service.MenuItemService;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 
 @RestController
@@ -24,11 +21,7 @@ public class MenuItemAPI {
     private final MenuItemService menuItemService;
 
 
-    @ExceptionHandler(NoSuchElementException.class)
-    ResponseEntity<String> handlerExceptions(NoSuchElementException e){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("An error occurred: "+e.getMessage());
-    }
+
     @PreAuthorize("permitAll()")
     @GetMapping
     public List<MenuItemAllResponse> findAll(@RequestParam(required = false) String global,

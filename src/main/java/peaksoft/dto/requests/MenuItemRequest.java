@@ -1,7 +1,9 @@
 package peaksoft.dto.requests;
 
 import jakarta.validation.constraints.Min;
+import lombok.Builder;
 
+@Builder
 public record MenuItemRequest(
         String name,
         String image,

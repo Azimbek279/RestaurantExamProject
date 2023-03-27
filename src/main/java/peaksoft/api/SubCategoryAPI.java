@@ -1,8 +1,6 @@
 package peaksoft.api;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import peaksoft.dto.requests.SubCategoryRequest;
@@ -13,7 +11,6 @@ import peaksoft.service.SubCategoryService;
 
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/subCategories")
@@ -21,11 +18,7 @@ import java.util.NoSuchElementException;
 public class SubCategoryAPI {
     private final SubCategoryService subcategoryService;
 
-    @ExceptionHandler(NoSuchElementException.class)
-    ResponseEntity<String> handlerExceptions(NoSuchElementException e){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("An error occurred: "+e.getMessage());
-    }
+
     @PreAuthorize("hasAnyAuthority('ADMIN','CHEF','WAITER')")
     @GetMapping
     public List<SubCategoryResponse> findAll(@RequestParam(required = false) Long id) {

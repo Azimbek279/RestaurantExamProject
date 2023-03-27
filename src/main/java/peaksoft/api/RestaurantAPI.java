@@ -7,12 +7,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import peaksoft.dto.requests.RestaurantRequest;
 import peaksoft.dto.responses.SimpleResponse;
-import peaksoft.dto.responses.restaurant.RestaurantAllResponse;
 import peaksoft.dto.responses.restaurant.RestaurantResponse;
-import peaksoft.dto.responses.user.EmployeeResponse;
 import peaksoft.service.RestaurantService;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
 

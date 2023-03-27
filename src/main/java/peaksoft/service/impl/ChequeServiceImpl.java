@@ -54,7 +54,12 @@ public class ChequeServiceImpl implements ChequeService {
                 .createdAt(LocalDate.now())
                 .build();
         menuItem.addCheque(cheque);
-        chequeRepository.save(cheque);
+        if (request.userId() != 1){
+            chequeRepository.save(cheque);
+        }else {
+            throw new NotFoundException(String.format("This is User : Admin"));
+        }
+
 
         return SimpleResponse.builder()
                 .status(HttpStatus.OK)

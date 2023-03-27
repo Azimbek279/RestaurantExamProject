@@ -1,8 +1,6 @@
 package peaksoft.api;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import peaksoft.dto.requests.StopListRequest;
@@ -11,7 +9,6 @@ import peaksoft.dto.responses.stopList.StopListResponse;
 import peaksoft.service.StopListService;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/stopLists")
@@ -19,11 +16,7 @@ import java.util.NoSuchElementException;
 public class StopListAPI {
     private final StopListService stopListService;
 
-    @ExceptionHandler(NoSuchElementException.class)
-    ResponseEntity<String> handlerExceptions(NoSuchElementException e){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("An error occurred: "+e.getMessage());
-    }
+
     @PreAuthorize("permitAll()")
     @GetMapping
     public List<StopListResponse> findAll() {

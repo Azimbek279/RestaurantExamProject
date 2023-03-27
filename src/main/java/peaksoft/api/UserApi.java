@@ -2,9 +2,6 @@ package peaksoft.api;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import peaksoft.dto.requests.AuthUserRequest;
@@ -15,7 +12,6 @@ import peaksoft.dto.responses.user.*;
 import peaksoft.service.UserService;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/users")
@@ -23,15 +19,8 @@ import java.util.NoSuchElementException;
 public class UserApi {
     private final UserService userService;
 
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<String> handlerException(NoSuchElementException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("An error occurred: " + e.getMessage());
-    }
 
-    /**
-     * LOGIN
-     **/
+
     @PostMapping("/login")
     public UserTokenResponse login(@RequestBody @Valid AuthUserRequest userRequest) {
         return userService.authenticate(userRequest);
